@@ -190,6 +190,9 @@ default: main bench
 ggml.o: ggml.c ggml.h
 	$(CC)  $(CFLAGS)   -c ggml.c -o ggml.o
 
+cuggml.o: ggml.cu ggml.h
+	nvcc -c ggml.cu -o cuggml.o
+
 whisper.o: whisper.cpp whisper.h
 	$(CXX) $(CXXFLAGS) -c whisper.cpp -o whisper.o
 
@@ -214,6 +217,9 @@ SRC_COMMON_SDL = examples/common-sdl.cpp
 main: examples/main/main.cpp $(SRC_COMMON) ggml.o whisper.o
 	$(CXX) $(CXXFLAGS) examples/main/main.cpp $(SRC_COMMON) ggml.o whisper.o -o main $(LDFLAGS)
 	./main -h
+
+cuda: examples/cuda/cuda.cpp $(SRC_COMMON) cuggml.o
+	nvcc -I. -I./examples examples/cuda/cuda.cpp $(SRC_COMMON) cuggml.o  -o cuda $(LDFLAGS)
 
 bench: examples/bench/bench.cpp ggml.o whisper.o
 	$(CXX) $(CXXFLAGS) examples/bench/bench.cpp ggml.o whisper.o -o bench $(LDFLAGS)
